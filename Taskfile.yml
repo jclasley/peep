@@ -1,0 +1,27 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task -l
+
+  check:
+    desc: Self-check (must print ok)
+    cmds:
+      - swift run Peep --check
+
+  fmt:
+    desc: Format Swift sources
+    cmds:
+      - swift format --in-place --recursive Sources
+
+  build:
+    desc: Build build/Peep.app and build/Peep.zip
+    cmds:
+      - scripts/build.sh {{.CLI_ARGS}}
+
+  run:
+    desc: Build and open the local app
+    cmds:
+      - task: build
+      - open build/Peep.app
