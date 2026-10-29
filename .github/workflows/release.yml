@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch: # manual test build: uploads the zip as an artifact, publishes nothing
 
 permissions:
   contents: write
@@ -15,8 +16,18 @@ jobs:
       - name: Self-check
         run: swift run Peep --check
       - name: Build
-        run: scripts/build.sh "${GITHUB_REF_NAME#v}"
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          [ "$GITHUB_REF_TYPE" = tag ] || version=0.0.0-dev
+          scripts/build.sh "$version"
+      - name: Upload test build
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Peep
+          path: build/Peep.zip
       - name: Publish
+        if: github.ref_type == 'tag'
         run: gh release create "$GITHUB_REF_NAME" build/Peep.zip --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
