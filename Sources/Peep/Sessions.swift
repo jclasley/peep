@@ -53,6 +53,7 @@ final class Store {
   var sessions: [String: Session] = [:]
   var stack: [String] = []  // waiting sessions, newest first
   var enabled: (Source) -> Bool = { _ in true }
+  var gone: (Session) -> Bool = { _ in false }  // deleted outside Peep, e.g. in Claude desktop
 
   // Returns the session when this event raised a new notification.
   @discardableResult
@@ -105,7 +106,7 @@ final class Store {
   func seen(_ id: String) { stack.removeAll { $0 == id } }
 
   func prune(_ now: Date = Date()) {
-    for (id, s) in sessions where now.timeIntervalSince(s.last) > 12 * 3600 {
+    for (id, s) in sessions where now.timeIntervalSince(s.last) > 12 * 3600 || gone(s) {
       sessions[id] = nil
       seen(id)
     }

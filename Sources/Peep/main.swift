@@ -86,6 +86,8 @@ final class Buddy: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
       case .chat: defaults.bool(forKey: "src.chat")
       }
     }
+    // ponytail: checked by prune every 60 s, so a deleted session lingers up to a minute; prune more often if that feels slow
+    store.gone = { $0.ev.source == .codeTab && desktopSessionID(cli: $0.id) == nil }
     // Rebuild state from the inbox without alerting, then start fresh if it has grown large.
     try? FileManager.default.createDirectory(
       at: inboxURL.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -394,6 +396,12 @@ func selfCheck() {
   assert(s.stack == ["a"], "a new prompt clears that notification")
   s.apply(Event(event: "SessionEnd", session_id: "a", term_program: term))
   assert(s.stack.isEmpty && s.sessions["a"] == nil, "SessionEnd removes the session")
+  let g = Store()
+  g.gone = { $0.id == "x" }
+  g.apply(Event(event: "Stop", session_id: "x"))
+  g.apply(Event(event: "Stop", session_id: "y"))
+  g.prune()
+  assert(g.sessions["x"] == nil && g.stack == ["y"], "prune drops sessions deleted outside Peep")
   assert(Event(event: "Stop", session_id: "c").source == .codeTab)
   assert(autoMux(Event(event: "Stop", session_id: "c", zellij_pane: "3")) == "zellij")
   assert(autoMux(Event(event: "Stop", session_id: "c", tmux_pane: "%1")) == "tmux")

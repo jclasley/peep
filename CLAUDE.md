@@ -102,6 +102,7 @@ Skin(name: "Blob", theme: "Cute", draw: { a, t, bl in
 ## Claude desktop
 
 - Code tab sessions open with `claude://code/continue?session=local_<id>`. The hook sees the CLI `session_id`, so `desktopSessionID` maps it to the desktop's `local_<id>` through `cliSessionId` in `~/Library/Application Support/Claude/claude-code-sessions/**/local_*.json`. These are internal app details and can change with Claude.app updates.
+- Deleting a Code tab session in the desktop doesn't always send `SessionEnd`. `prune` drops a Code tab session once no `local_*.json` holds its CLI id (`Store.gone`).
 - Desktop *chat* alerts (Settings → Alert sources, beta) look for a "Stop" button in Claude.app through Accessibility. They need Accessibility permission and can only bring the app to the front.
 
 ## Conventions
