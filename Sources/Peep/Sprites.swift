@@ -354,41 +354,56 @@ let skins: [Skin] = [
       }
     }),
   Skin(
-    name: "Jack", theme: "Seasonal",
+    name: "Spruce", theme: "Seasonal",
     draw: { a, t, bl in
-      let o = rgb(0xE8822A)
-      let od = rgb(0xC2621B)
-      let glow = t % 10 < 5 ? rgb(0xFFD25A) : rgb(0xFAC775)
-      a.e(10, 19, 7, 7.5, o)
-      a.e(22, 19, 7, 7.5, o)
-      a.e(16, 19, 8, 8.5, o)
-      a.r(9, 14, 1, 10, od)
-      a.r(22, 14, 1, 10, od)
-      a.r(15, 7, 2, 4, rgb(0x5E7B2E))
-      a.e(20, 8, 3, 1.5, rgb(0x7FA83A))
-      a.face(16, 3, bl, ec: glow, cheeks: false, mc: glow)
+      // Tiers: (top row, bottom row, top half-width, bottom half-width); bottom row is shaded.
+      for (y0, y1, w0, w1) in [(7, 11, 1, 5), (11, 16, 3, 8), (15, 23, 5, 12)] {
+        for y in y0...y1 {
+          let hw = Int((Double(w0) + Double((y - y0) * (w1 - w0)) / Double(y1 - y0)).rounded())
+          a.r(16 - hw, y, 2 * hw, 1, y == y1 ? rgb(0x2E7A3D) : rgb(0x3F9B4F))
+        }
+      }
+      a.r(14, 24, 4, 3, rgb(0x8A5A3B))
+      let star = t % 10 < 5 ? rgb(0xFFD25A) : rgb(0xFAC775)
+      a.r(15, 4, 2, 3, star)
+      a.r(14, 5, 4, 1, star)
+      let baubles = [rgb(0xE24B4A), rgb(0xFAC775), rgb(0x378ADD)]
+      for (i, (x, y)) in [(7, 22), (24, 22), (10, 14), (21, 14), (15, 10)].enumerated() {
+        a.r(x, y, 2, 1, baubles[(i + (t >> 3)) % 3])
+      }
+      a.face(16, 3, bl)
     }),
   Skin(
-    name: "Frost", theme: "Seasonal",
+    name: "Flurry", theme: "Seasonal",
     draw: { a, t, bl in
-      let s = rgb(0xF4F7FB)
-      a.e(16, 22.5, 8, 6, s)
-      a.r(10, 28, 12, 1, rgb(0xD6E0EE))
-      a.e(16, 12, 6, 5.5, s)
-      a.r(11, 3, 10, 4, Col.k)
-      a.r(11, 6, 10, 1, Col.cl)
-      a.r(9, 7, 14, 1, Col.k)
-      a.r(10, 16, 12, 2, Col.cl)
-      a.r(19, 18, 2, 4, Col.cl)
-      a.r(15, 21, 2, 1, Col.k)
-      a.r(15, 24, 2, 1, Col.k)
-      a.face(10, 2, bl, eh: 2)
-      a.r(16, 12, 3, 1, rgb(0xE8822A))
+      // 2×2 brush along a ray, so arms stay symmetric around the center line.
+      func arm(_ x: Double, _ y: Double, _ g: Double, _ len: Double) {
+        for s in stride(from: 0, through: len, by: 0.5) {
+          a.r(
+            Int((x + cos(g) * s).rounded(.down)), Int((y + sin(g) * s).rounded(.down)), 2, 2,
+            rgb(0x85B7EB))
+        }
+      }
+      for k in 0..<6 {
+        let g = .pi / 2 + Double(k) * .pi / 3
+        arm(15, 15, g, 12)
+        let bx = 15 + cos(g) * 7.5
+        let by = 15 + sin(g) * 7.5
+        arm(bx, by, g + 0.8, 3.5)
+        arm(bx, by, g - 0.8, 3.5)
+      }
+      a.e(16, 16, 6.5, 6.5, rgb(0xDDEFF5))
+      a.face(14, 2, bl)
     },
     overlay: { a, t in
-      for (x, o) in [(4, 0), (27, 9), (7, 17), (25, 24)] {
-        let y = Double((t / 3 + o) % 30)
-        if a.empty(Double(x), y) { a.p(Double(x), y, rgb(0x85B7EB)) }
+      // A twinkle hops to the next arm tip every 6 s.
+      let k = t % 60
+      guard k < 12 else { return }
+      let g = .pi / 2 + Double(t / 60 % 6) * .pi / 3
+      let x = (16 + cos(g) * 12).rounded(.down)
+      let y = (16 + sin(g) * 12).rounded(.down)
+      for (dx, dy) in [(0.0, 0.0), (1, 0), (-1, 0), (0, 1), (0, -1)] {
+        a.p(x + dx, y + dy, k < 6 ? Col.w : rgb(0xFFE9B0))
       }
     }),
 ]
