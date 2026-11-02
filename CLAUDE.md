@@ -12,7 +12,7 @@ A floating pixel-art buddy for macOS that tells you when a Claude Code session f
 | `<app>/Contents/MacOS/Peep --install-hooks` / `--uninstall-hooks` | Install or remove the hooks without the GUI (used by the README's agent install steps) |
 | `swift format --in-place --recursive Sources` | Format after every change |
 
-Releases: pushing a `v*` tag runs `.github/workflows/release.yml`, which runs the self-check, builds, and attaches the zip to a GitHub release. Use right-click → Test alert / Test question to try alerts without Claude Code.
+Releases: pushing a `v*` tag runs `.github/workflows/release.yml`, which runs the self-check, builds, and attaches the zip to a GitHub release. Use Option-right-click → Test alert / Test question to try alerts without Claude Code.
 
 When you run a local build, it re-points the hooks to itself (see `setUpHooks`). The installed copy takes them back the next time it starts.
 
