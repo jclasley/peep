@@ -409,7 +409,10 @@ let skins: [Skin] = [
 ]
 
 // Confused: quick double blink plus a sweat drop; the view adds a side-to-side sway.
-func frame(_ skin: Skin, t: Int, badge: String?, confused: Bool = false) -> Px {
+// Working: three typing dots in the badge corner, lit one after another.
+func frame(_ skin: Skin, t: Int, badge: String?, confused: Bool = false, working: Bool = false)
+  -> Px
+{
   var a = Px()
   let k = t % 24
   skin.draw(&a, t, confused ? (k < 2 || (k >= 4 && k < 6)) : t % 45 < 2)
@@ -420,6 +423,12 @@ func frame(_ skin: Skin, t: Int, badge: String?, confused: Bool = false) -> Px {
     o.r(4, y + 1, 3, 2, rgb(0x85B7EB))
     o.p(5, Double(y), rgb(0x85B7EB))
     o.p(4, Double(y + 1), Col.w)
+  }
+  if working {
+    for i in 0..<3 {
+      let lit = i == (t / 4) % 4
+      o.r(21 + i * 3, lit ? 2 : 3, 2, 2, lit ? Col.k : rgb(0xB4B2A9))
+    }
   }
   if let badge { o.badge(badge) }
   return o

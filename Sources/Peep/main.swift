@@ -143,8 +143,11 @@ final class Buddy: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     let skin = skins.first { $0.name == defaults.string(forKey: "skin") } ?? skins[2]
     let n = store.stack.count
     let confused = store.topBlocked
+    let working = n == 0 && store.anyWorking
     view.image = cgImage(
-      frame(skin, t: tick, badge: badgeText(n, question: confused), confused: confused))
+      frame(
+        skin, t: tick, badge: badgeText(n, question: confused), confused: confused,
+        working: working))
     view.dx = confused ? [0, -1, 0, 1][(tick / 3) % 4] : 0
     view.bob = confused ? 0 : n > 0 ? (tick % 4 < 2 ? 2 : 0) : (tick / 8) % 2
     view.needsDisplay = true
@@ -344,6 +347,7 @@ func selfCheck() {
   assert(transcriptTitle(transcript) == "Renamed", "a /rename title wins")
   try? FileManager.default.removeItem(atPath: transcript)
 
+  assert(frame(skins[0], t: 0, badge: nil, working: true).a[2 * W + 21] == Col.k, "first dot lit")
   for skin in skins {
     for t in 0..<120 {
       var a = Px()
@@ -377,7 +381,9 @@ func selfCheck() {
   assert(s.sessions["a"]?.title == "alpha", "title falls back to the folder")
   s.apply(Event(event: "UserPromptSubmit", session_id: "a", title: "Fix login", term_program: term))
   assert(s.sessions["a"]?.state == .working && s.sessions["a"]?.title == "Fix login")
+  assert(s.anyWorking)
   assert(s.apply(Event(event: "Stop", session_id: "a", term_program: term)) != nil)
+  assert(!s.anyWorking, "Stop ends working")
   assert(s.sessions["a"]?.title == "Fix login", "an empty title keeps the old one")
   s.apply(Event(event: "Stop", session_id: "b", cwd: "/x/beta", term_program: term))
   s.apply(Event(event: "Stop", session_id: "a", term_program: term))

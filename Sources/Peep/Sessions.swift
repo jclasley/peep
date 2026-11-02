@@ -99,6 +99,7 @@ final class Store {
   }
 
   var topBlocked: Bool { stack.first.flatMap { sessions[$0] }?.state == .blocked }
+  var anyWorking: Bool { sessions.values.contains { $0.state == .working } }
 
   func pop() -> String? { stack.isEmpty ? nil : stack.removeFirst() }
   func seen(_ id: String) { stack.removeAll { $0 == id } }
