@@ -63,7 +63,7 @@ Follow these steps in order. Tell the user what you are about to do before steps
    If macOS says the app can't be opened because it isn't notarized, ask the user to right-click it in Applications → **Open** → **Open**. Do not change Gatekeeper settings yourself.
 6. **Hand over to the user.** Tell them:
    - Allow notifications when macOS asks.
-   - The buddy floats in the bottom-right corner. Right-click it → **Test alert** to try it.
+   - The buddy floats in the bottom-right corner. Option-right-click it → **Test alert** to try it.
    - Restart any Claude Code sessions that are already running, so they load the hooks.
    - Right-click → Settings → **Open at login** starts the buddy every time they log in.
    - If double-clicking opens the wrong terminal, set Settings → **Terminal** and **Multiplexer** by hand.
@@ -76,7 +76,7 @@ To uninstall: run the binary with `--uninstall-hooks`, quit the app, delete `/Ap
 |---|---|
 | Drag | Move the buddy anywhere |
 | Double-click | Open the newest waiting session, or Claude if nothing is waiting |
-| Right-click | Waiting notifications, open sessions, skins, settings, test alerts |
+| Right-click | Waiting notifications, open sessions, skins, settings (hold Option for test alerts) |
 
 **Settings** (right-click → Settings):
 - **Terminal** and **Multiplexer**: Auto detects them per session. Pick one if Auto guesses wrong.

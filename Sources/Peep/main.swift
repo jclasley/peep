@@ -247,8 +247,10 @@ final class Buddy: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     let s = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
     s.submenu = settings
     m.addItem(s)
-    m.addItem(item("Test alert", #selector(testAlert(_:)), "Stop"))
-    m.addItem(item("Test question", #selector(testAlert(_:)), "Blocked"))
+    if NSEvent.modifierFlags.contains(.option) {  // test items only with Option held
+      m.addItem(item("Test alert", #selector(testAlert(_:)), "Stop"))
+      m.addItem(item("Test question", #selector(testAlert(_:)), "Blocked"))
+    }
     m.addItem(item("Quit", #selector(NSApplication.terminate(_:)), nil, target: NSApp))
     return m
   }
