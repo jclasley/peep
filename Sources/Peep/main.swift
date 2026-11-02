@@ -202,15 +202,17 @@ final class Buddy: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
       m.addItem(item("\(s.title) — \(ago(s.last))", #selector(openSession(_:)), id))
     }
     m.addItem(.separator())
-    m.addItem(header("Sessions"))
-    for s in store.sessions.values.sorted(by: { $0.last > $1.last }) {
-      let state =
-        switch s.state {
-        case .working: "◌ \(s.title) — working"
-        case .blocked: "? \(s.title) — needs input"
-        case .idle: "· \(s.title) — idle"
-        }
-      m.addItem(item(state, #selector(openSession(_:)), s.id))
+    for (name, st, mark) in [
+      ("Needs input", State.blocked, "?"), ("Working", .working, "◌"), ("Idle", .idle, "·"),
+    ] {
+      let group = store.sessions.values.filter { $0.state == st }.sorted { $0.last > $1.last }
+      if group.isEmpty { continue }
+      m.addItem(header(name))
+      for s in group {
+        let i = item("\(mark) \(s.title)", #selector(openSession(_:)), s.id)
+        i.indentationLevel = 1
+        m.addItem(i)
+      }
     }
     m.addItem(.separator())
     m.addItem(choice("Skin", "skin", skins.map { ("\($0.name) (\($0.theme))", $0.name) }))
